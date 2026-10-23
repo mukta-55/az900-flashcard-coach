@@ -1192,6 +1192,19 @@ export const cards: Flashcard[] = [
     needs_verification: false,
   },
   {
+    id: "is-16",
+    skill_area: "Identity & Security",
+    skill_ref: R.conditionalAccess,
+    type: "scenario",
+    front:
+      "A company wants users to be asked for MFA only when they sign in from an unfamiliar location. Which Entra feature does this?",
+    back: "Conditional Access.",
+    explanation:
+      "A Conditional Access policy checks conditions such as location at sign-in and then enforces a decision, here requiring MFA.",
+    difficulty: 2,
+    needs_verification: false,
+  },
+  {
     id: "is-08",
     skill_area: "Identity & Security",
     skill_ref: R.rbac,

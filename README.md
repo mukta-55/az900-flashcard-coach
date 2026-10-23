@@ -2,149 +2,135 @@
 
 **Unofficial study tool. Not affiliated with or endorsed by Microsoft.**
 
-A spaced-repetition flashcard app for learners preparing for the Microsoft Azure Fundamentals (AZ-900) exam. Built for self-studying learners, especially those on phones with limited data.
+Live app: https://mukta-55.github.io/az900-flashcard-coach/
 
-## Problem It Solves
+A spaced-repetition flashcard app for people preparing for the Microsoft Azure Fundamentals (AZ-900) exam. It was built for the #1MillionDevs Vibe Coding Hackathon (AZ-900 Exam Prep Edition) and is designed for self-studying learners, especially those on phones with limited data.
 
-Learners struggle to remember Azure terms, services, and concepts. This tool uses the Leitner system (spaced repetition with 5 boxes) to help learners revise key concepts and spend more time on cards they keep getting wrong.
+## The problem
 
-## Target Users
+AZ-900 has a lot of terms that look alike: regions and availability zones, LRS and GRS, Entra ID and Entra Domain Services, Azure Policy and resource locks. Reading notes once does not make them stick, and learners rarely know which concepts they keep getting wrong.
+
+## What it does
+
+The app shows short cards, asks you to rate how well you knew each answer, and brings back the cards you miss more often than the ones you know. It uses the Leitner system, a simple form of spaced repetition with five boxes.
+
+## Who it is for
 
 - Self-studying learners preparing for AZ-900
-- Mobile-first (works from 360px wide)
-- Short study sessions (5–15 minutes)
-- Works offline after first load
+- People who study on a phone in short sessions (5 to 15 minutes)
+- People with unreliable or expensive data: after the first visit the app works offline
 
 ## Features
 
-### Learning Engine
-- **Leitner system** with 5 boxes (intervals: 1, 2, 4, 8, 16 days)
-- **Three answer buttons**: Missed it (→ Box 1), Almost (stay), Got it (↑ next box)
-- **Trouble cards**: cards with 3+ lapses in Box 1-2 get dedicated study mode
-- **Mastered cards**: Box 5 cards with last two answers "Got it"
-- **Exam date**: optional countdown that caps review intervals
-- **Streak tracking**: consecutive days with at least one review
-- **Session queue**: due cards (most overdue first), then trouble cards, then new cards
+### Learning engine
+
+- Leitner system with 5 boxes (review intervals of 1, 2, 4, 8 and 16 days)
+- Three answer buttons after flipping a card: **Missed it** (back to Box 1), **Almost** (stays in the same box) and **Got it** (up one box)
+- **Trouble cards**: cards with 3 or more misses that are still in Box 1 or 2 get their own study mode
+- **Mastered cards**: cards in Box 5 whose last two answers were "Got it"
+- Daily new-card goal and an optional exam date with a countdown
+- Streak counter for consecutive study days
+- Session order: due cards (most overdue first), then trouble cards, then new cards
 
 ### Content
-- 108+ flashcards covering all 54 skill bullets in the AZ-900 outline
-- Card types: definition, compare, scenario, acronym
-- "Often confused with" panels for commonly mixed-up concepts
-- Real-life analogies (schools, cooperatives, shops) - no real company claims
-- All content written from scratch, no reproduced exam questions
+
+- 132 cards covering all 54 skill bullets in the AZ-900 skills outline, with at least two cards per bullet
+- Card types: 85 definition, 28 scenario and 19 compare cards
+- Compare cards for pairs that are easy to mix up, with an "Often confused with" panel
+- Every card records the exact outline bullet it covers (`skill_ref`)
+- Analogies use everyday settings (schools, cooperatives, shops). They never claim a real company uses Azure.
+- All cards are written from scratch. They are not real exam questions.
 
 ### Screens
-1. **Onboarding** (3 steps): welcome, exam date, daily goal
-2. **Home**: due/new/trouble counts, streak, mastery bars, start session
-3. **Study**: flip card, answer buttons, progress bar, undo, session summary
-4. **Browse**: search, filter by area/type, view any card
-5. **Progress**: mastery per area, cards per box, 14-day history (inline SVG)
-6. **Settings**: daily goal, exam date, theme, export/import, reset
+
+1. **Onboarding**: welcome, exam date, daily goal
+2. **Home**: due, new and trouble counts, streak, days until the exam, mastery per topic area
+3. **Study**: flip the card, answer buttons, progress bar, undo, session summary
+4. **Browse**: search and filter the deck
+5. **Progress**: mastery per area, cards per box, recent history
+6. **Settings**: daily goal, exam date, theme, export and import of progress, reset
 
 ### Technical
-- React + Vite + Tailwind CSS
-- All progress stored in localStorage (with try/catch for storage errors)
-- Service worker for offline support
-- Web app manifest (installable on phones)
-- Dark/light/system theme support
-- WCAG AA contrast, 44px minimum tap targets
-- Keyboard shortcuts during study (Space to flip, 1/2/3 to answer)
-- Export/import progress as JSON backup
 
-## How to Run
+- React, TypeScript, Vite and Tailwind CSS
+- Progress is saved in the browser (`localStorage`) with error handling for blocked or full storage
+- Service worker for offline use after the first visit
+- Dark, light and system themes
+- Keyboard shortcuts while studying: Space to flip, 1/2/3 to answer
+- Export and import of progress as a JSON file
+
+## Run it locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+Open the address printed in the terminal. The dev server is configured for port 3000, and because the app is built for GitHub Pages the path may include `/az900-flashcard-coach/`.
+
+To build for production:
+
+```bash
+npm run build
+```
 
 ## Deploy to GitHub Pages
 
-1. Push this repository to GitHub
-2. Go to Settings → Pages
-3. Set Source to "GitHub Actions"
-4. Create `.github/workflows/deploy.yml`:
+The repository deploys automatically with GitHub Actions on every push to `main`.
 
-```yaml
-name: Deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-  deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/deploy-pages@v4
-```
+1. In the repository, go to **Settings > Pages** and set **Source** to **GitHub Actions**.
+2. The workflow is in `.github/workflows/deploy.yml`. It installs dependencies, builds the app and publishes the `dist` folder.
+3. `vite.config.js` sets `base: "/az900-flashcard-coach/"`. If you rename the repository, change this value to match, or the page will load blank.
+4. The service worker is registered with a relative path (`./sw.js`) and caches relative paths, so it works under the repository sub-path.
 
-5. The app will be available at `https://<username>.github.io/<repo>/`
-
-## Architecture
+## Project structure
 
 ```
 src/
-├── App.tsx          # Main app with all screens
-├── types.ts         # TypeScript types and constants
+├── App.tsx          # All screens
+├── types.ts         # Types and constants
 ├── data/
-│   └── cards.ts     # Flashcard deck (JSON-like data)
+│   └── cards.ts     # The flashcard deck
 ├── engine/
-│   ├── leitner.ts   # Learning engine (spaced repetition)
+│   ├── leitner.ts   # Spaced-repetition logic
 │   └── storage.ts   # localStorage wrapper
-├── index.css        # Tailwind + design tokens
-└── main.tsx         # Entry point + SW registration
+├── index.css        # Tailwind and design tokens
+└── main.tsx         # Entry point and service worker registration
 
 public/
-├── manifest.json    # PWA manifest
+├── manifest.json    # Web app manifest
 └── sw.js            # Service worker
 ```
 
-## How the Deck Was Verified
+## How it was built
 
-- Every card maps to a specific bullet in the official AZ-900 skills outline
-- Each outline bullet has at least 2 cards
-- Compare cards cover commonly confused concept pairs
-- No numbers that change (prices, SLAs, quotas) are stated
-- Real-life examples are analogies only
-- Cards with uncertain facts are marked `needs_verification: true`
+- **Prompt:** the prompt that specified the app is in [PROMPT.md](PROMPT.md), together with what changed from it and why.
+- **Code:** Qwen Coder generated the app. The prompt asked for plain HTML, CSS and JavaScript, but Qwen built it in its own React, Vite and Tailwind setup, and the project stayed in that stack.
+- **Deployment:** set up with GitHub Actions and GitHub Pages. The Vite base path and the service worker paths were fixed so the app works under the repository sub-path.
 
-## Adding Another Certification
+## How the deck was reviewed
 
-The card deck is data, not code. To add another certification:
+- The scope comes only from the AZ-900 skills outline copied from Microsoft Learn. No topic outside it was added.
+- Qwen generated the first version of the deck. It was then reviewed with help from Claude, using Microsoft Learn and other web sources.
+- Claims were checked one at a time and the errors found were corrected. Examples: AzCopy does not support Table storage in its current version; with GRS the secondary copy is readable only after a failover; Azure Germany is no longer a current sovereign-region example; the Microsoft Defender for Cloud and Microsoft Purview descriptions were outdated or incomplete.
+- Every card's `skill_ref` was set to the exact outline wording.
+- The plain definition cards were read through but not each looked up individually, so errors may remain. Check anything important against Microsoft Learn.
+- One card states a hedged figure ("about 300 miles" between region pairs) because Microsoft's own training material uses it.
 
-1. Create a new file in `src/data/` (e.g., `aws-cloud-practitioner.ts`)
-2. Follow the same card schema (id, skill_area, skill_ref, type, front, back, explanation, etc.)
-3. Update `SKILL_AREAS` in `types.ts` with the new certification's areas
-4. Import the new deck in the relevant screen components
+## Adding another certification
 
-## Known Limitations
+The deck is a plain data file (`src/data/cards.ts`) and each card has the same fields: `id`, `skill_area`, `skill_ref`, `type`, `front`, `back`, `explanation`, optional `example` and `confused_with`, `difficulty` and `needs_verification`. Another certification would need a new data file in the same format and a way for the app to load it. A deck selector is not built yet.
 
-- Progress is stored only in localStorage (one device). Use Export/Import to transfer.
-- No cloud sync between devices
-- Service worker caches assets but not dynamic content
-- Undo only goes back one card (does not reverse box changes)
-- Icons are placeholder (PWA install works but shows default icon)
+## Known limitations
+
+- Progress is stored on one device only. Use Export and Import to move it. There is no cloud sync.
+- The first visit needs an internet connection. After that the app works offline.
+- Install-to-home-screen icons are missing: the manifest points to icon files that are not in the repository, so the install experience is incomplete.
+- Mastery bars are per topic area (11 areas), not per exam domain, so they do not mirror the exam weightings.
+- "Deck mastery" shows how much of the deck you have learned. It does not predict an exam result.
+- Undo reverses only the last answer.
+- The deck may contain mistakes and may fall behind future changes to the exam. It is a study aid, not an official source.
 
 ## Disclaimer
 
-This is an **unofficial** study tool. It is not affiliated with, endorsed by, or connected to Microsoft Corporation. AZ-900 is a trademark of Microsoft Corporation.
+This is an **unofficial** study tool. It is not affiliated with, endorsed by or connected to Microsoft. Microsoft, Azure and AZ-900 are names owned by Microsoft.
